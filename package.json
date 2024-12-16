@@ -4,7 +4,7 @@
   "description": "education app",
   "main": "feedTheMonster.js",
   "scripts": {
-    "release": "release-it",
+    "release": "standard-version --release-as minor",
     "dev": "webpack --config webpack.config.js"
   },
   "repository": {
@@ -57,5 +57,8 @@
         }
       }
     }
+  },
+  "devDependencies": {
+    "standard-version": "^9.5.0"
   }
 }
