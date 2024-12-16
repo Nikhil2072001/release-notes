@@ -2,7 +2,7 @@
   "name": "feedthemonsterjs",
   "version": "1.0.37",
   "description": "education app",
-  "main": "feedTheMonster.js",
+  "main": "index.js",
   "scripts": {
     "release": "standard-version --release-as minor",
     "dev": "webpack --config webpack.config.js"
