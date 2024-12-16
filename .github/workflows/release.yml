@@ -1,44 +1,39 @@
 name: Release Process
 
 permissions:
-  contents: write
-  
+  contents: write  # Allow write access to contents (needed for git operations like push)
+
 on:
   push:
     branches:
-      - main  # Trigger on pushes to main
-      - develop  # Trigger on pushes to develop
+      - main
+      - develop
   pull_request:
     branches:
-      - develop  # Trigger when a PR is opened for develop
+      - develop
 
 jobs:
   release:
     name: Release on Develop to Main PR
     runs-on: ubuntu-latest
     steps:
-      # Checkout the repository code
       - name: Checkout code
         uses: actions/checkout@v2
 
-      # Set up Node.js environment
       - name: Set up Node.js
         uses: actions/setup-node@v2
         with:
           node-version: '14'
 
-      # Install project dependencies
       - name: Install dependencies
         run: |
           npm install
 
-      # Set Git user configuration before any git operations (for commits)
       - name: Set Git user
         run: |
           git config --global user.name "github-actions"
           git config --global user.email "github-actions@github.com"
 
-      # Only run this step when merging PR into `main`
       - name: Bump version and generate changelog
         run: |
           if [ "${GITHUB_REF##*/}" == "main" ]; then
@@ -47,7 +42,6 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      # Commit version bump, changelog updates if there are any changes
       - name: Commit version bump and changelog
         run: |
           git add .
@@ -55,7 +49,12 @@ jobs:
           git push
         if: success()
 
-      # Create a GitHub release (ensure gh CLI is installed and authenticated)
+      # Ensure the tag is pushed to the remote repository before creating the release
+      - name: Push the new tag
+        run: |
+          git push origin v$(jq -r .version package.json)
+        if: success()
+
       - name: Create release
         run: |
           RELEASE_VERSION=$(jq -r .version package.json)
